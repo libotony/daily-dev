@@ -9,7 +9,7 @@ script:
 deploy:
   provider: pages
   skip_cleanup: true
-  local_dir: pulic
+  local_dir: public
   github_token: $GH_TOKEN # Set in travis-ci.org dashboard
   fqdn: blog.outofgas.io
   on:
