@@ -1,19 +1,24 @@
 ---
 title: Gas Estimation
 date: 2019-05-20 13:24:06
-tags: [dapp,wallet,sdk]
+tags: [dapp,wallet,sdk,gas]
 ---
 
 Gas is an unit that measures the transaction cost in EVM ecosystem. It is well known that transfers native coin(e.g. VET, ETH) needs 21000 gas to cover the transaction fee, but regarding the contract creation and execution, the gas cost is not a fixed value. The gas cost depends on the `state` on which executed the tx, this is related with EVM's gas consumption mechanism. One transaction packed in different block could result in different gas cost.
 
 Transaction gas is composed with two parts, `Intrinsic Gas` and `Runtime Gas`. The `Intrinsic Gas` for a transaction is the amount of the transaction used before runtime executes the transaction. 
 
- 
+{% note default %}
 **intrinsicGas = txGas + SUM(clause.typeGas + clause.dataGas)**
+{% endnote %}
 
 `Intrinsic Gas` is deterministic for an transaction while `Runtime Gas` is dynamic.We have a way to evaluate a transaction's `Runtime Gas` by the API `POST /accounts/*`. As stated above, the evaluated gas just based on the current `BestBlock's State`. The gas cost may change when you send the same transaction to the blockchain with the evaluated gas. So the trick is:
 
+{% note default %}
 **You need to increase the evaluated gas before sending to the blockchain.**
+{% endnote %}
+
+<!-- more -->
 
 This means differently for different individuals:
 
@@ -40,6 +45,8 @@ It's just checking the ticket amount and the transferred VET amount and send the
 
 After some minutes digging with the team, we found a possible clue. The gas cost of op_cod `CALL` with value transfer has at least a fixed gas cost of 9000, after the `CALL` operation finished the vm will return the left over gas. Total gas used for `CALL` is much lower than 9000 since there is no code to run for the recipient. I traced the transaction and got the `CALL` only cost no more than 1000 gas. But to make the transaction succeed, you need at least 8000 extra gas for it to make this step's gas deduction succeed. So the trick failed since the evaluated gas is a small amount :(. But we upgraded it by:
 
+{% note info %}
 **Increase the evaluated gas by a fixed amount: 15000.**
+{% endnote %}
 
 > EVM make the `CALL` with value transfer a fixed gas cost other than the total left over gas for reason, mainly for preventing attacks.

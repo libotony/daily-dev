@@ -1,7 +1,7 @@
 ---
 title: Watch The Blockchain
 date: 2019-05-16 21:49:12
-tags:
+tags: [dapp,connex,vechain,subscribe,websocket]
 ---
 
 ## Introduction
@@ -16,9 +16,13 @@ Ticker is an API from Connex. In the doc, it is described as following:
 
 Ticker will make it possible for apps to be notified once there is new state on the blockchain.
 
+<!-- more -->
+
 ## Use Cases
 
-*Disclaimer: Codes in the article is just for demonstrating.*
+{% note warning %}
+*Disclaimer: codes in the article is just for demonstrating.*
+{% endnote %}
 
 Apps interact with the blockchain by sending transaction.Sometimes the app needs to wait for the transaction receipt. We can do it by the following code:
 
