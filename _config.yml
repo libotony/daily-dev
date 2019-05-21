@@ -3,17 +3,17 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: ️️️️Out of Gas
-subtitle: ️insufficient enerngy
+title: Insufficient Enerngy
+subtitle: 
 description:
-keywords:
-author: 
-language:
+keywords: 
+author: tony.li
+language: en
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://blog.outofgas.io
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -92,5 +92,15 @@ theme_config:
   #scheme: Mist
   #scheme: Pisces
   scheme: Gemini
+  # Declare license on posts
+  footer:
+    icon:
+      name: heart
+    powered:
+      enable: true
+      version: false
+    theme:
+      enable: true
+      version: false
 
 
