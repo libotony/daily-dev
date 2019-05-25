@@ -15,7 +15,7 @@ Transaction gas is composed with two parts, `Intrinsic Gas` and `Runtime Gas`. T
 `Intrinsic Gas` is deterministic for an transaction while `Runtime Gas` is dynamic.We have a way to evaluate a transaction's `Runtime Gas` by the API `POST /accounts/*`. As stated above, the evaluated gas just based on the current `BestBlock's State`. The gas cost may change when you send the same transaction to the blockchain with the evaluated gas. So the trick is:
 
 {% note default %}
-**You need to increase the evaluated gas before sending to the blockchain.**
+**You need to increase the evaluated gas before add it to tx gas.**
 {% endnote %}
 
 <!-- more -->
