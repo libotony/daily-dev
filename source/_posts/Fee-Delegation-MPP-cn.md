@@ -40,7 +40,7 @@ tags: [dapp,mpp,fee delegation,多方支付,代付,交易费]
 + 检查赞助账户是否有足够的余额
 + 检查 `CommonTo` 的账户是否有足够的余额（优先从赞助账户扣除）
 
-如果以上检查都通过，则此交易为被代付的交易，最终会体现为交易的 `GasPayer ≠ TxOrigin`
+如果以上检查都通过，则此交易为被代付的交易，最终会体现为交易的 `GasPayer ≠ TxOrigin`， 这个时候 `GasPayer` 可能是 `CommonTo` 的赞助者或者 `CommonTo` 它本身
 
 ## 限制
 
