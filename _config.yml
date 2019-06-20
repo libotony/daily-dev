@@ -102,5 +102,7 @@ theme_config:
     theme:
       enable: true
       version: false
-
-
+  # Google Analytics
+  google_analytics:
+   tracking_id: UA-142494873-2
+   localhost_ignored: true
