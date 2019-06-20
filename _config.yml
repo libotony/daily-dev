@@ -106,3 +106,15 @@ theme_config:
   google_analytics:
    tracking_id: UA-142494873-2
    localhost_ignored: true
+  # Script Vendors. Set a CDN address for the vendor you want to customize.
+  # For example
+  #   jquery: https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js
+  # Be aware that you would better use the same version as internal ones to avoid potential problems.
+  # Please use the https protocol of CDN files when you enable https on your site.
+  vendors:
+    # Internal path prefix. Please do not edit it.
+    _internal: lib
+    # Internal version: 4.6.2
+    # See: https://fontawesome.com
+    # Example:
+    fontawesome: //cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css
