@@ -6,7 +6,7 @@ tags: [dapp,mpp,fee delegation,vip191,多方支付,代付,交易费]
 
 在上一篇 {% post_link Fee-Delegation-MPP-zh %} 中，介绍了 `MPP - 基于账户原型的交易费用代付协议` 也提到了它在某些情况下是无法满足开发者需求的。尤其是 [Totient Labs](https://www.totientlabs.com/) 在开发应用 [CometVerse](https://play.cometverse.com/) 的时候组合了多个合约又希望可以为用户付交易费，所以 [Totient Labs](https://www.totientlabs.com/) 提出了 [VIP-191](https://github.com/vechain/VIPs/blob/master/vips/VIP-191.md) 来扩展费用代付协议。
 
-## VIP-191
+## VIP-191 的内容
 
 VIP-191 的提出是为了扩展费用代付协议，扩展它的应用场景来弥补原有 `MPP` 无法覆盖到的情况。 它主要包含以下方面：
 
@@ -21,9 +21,9 @@ VIP-191 的提出是为了扩展费用代付协议，扩展它的应用场景来
 2. `TxOrigin` 签名 && `Delegator` 签名(无先后顺序限制)共同构成交易签名
 3. 通过加入完整签名构建完整交易并广播到区块链
 
-## VIP-191
+## 交易费的扣除
 
-当执行一个指定VIP-191协议的交易时，区块链会从（且仅从） `Delegator` 账户扣除手续费。而不指定VIP-191协议的交易则应用 `MPP` 或直接从 `TxOrigin` 扣除手续费。
+当执行一个指定`VIP-191`协议的交易时，区块链会从（且仅从） `Delegator` 账户扣除手续费。而不指定VIP-191协议的交易则应用 `MPP` 或直接从 `TxOrigin` 扣除手续费。
 
 ## MPP vs VIP-191
 
