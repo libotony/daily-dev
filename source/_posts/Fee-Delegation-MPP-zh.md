@@ -6,7 +6,7 @@ tags: [dapp,mpp,fee delegation,vip191,多方支付,代付,交易费]
 
 在开始之前，我们先描述几个概念：
 
-`TxOrigin`: 交易发起方，通常是一个账户
+`TxOrigin`: 交易发起方，一个外部账户（私钥控制的账户）
 `GasPayer`: 支付交易费用的账户
 `Fee Delegation`: 交易费用委托(代付), 一般指交易费用不是由 `TxOrigin` 支付的场景
 `Multi Party Payment`: 多方支付协议, `Fee Delegation` 的一种形式
@@ -37,8 +37,7 @@ tags: [dapp,mpp,fee delegation,vip191,多方支付,代付,交易费]
 + 检查交易的 `Clauses` 是否共享同一个接收账户(`CommonTo`)
 + 检查 `TxOrigin` 是否为合约账户 `CommonTo` 的用户
 + 检查用户的额度
-+ 检查赞助账户是否有足够的余额
-+ 检查 `CommonTo` 的账户是否有足够的余额（优先从赞助账户扣除）
++ 检查 `CommonTo` 的账户是否有足够的`VTHO`（优先从赞助账户扣除）
 
 如果以上检查都通过，则此交易为被代付的交易，最终会体现为交易的 `GasPayer ≠ TxOrigin`， 这个时候 `GasPayer` 可能是 `CommonTo` 的赞助者或者 `CommonTo` 本身。
 
