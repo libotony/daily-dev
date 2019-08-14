@@ -1,7 +1,7 @@
 ---
-title: Fee Delegation - VIP191
+title: Fee Delegation - VIP191(中文版)
 date: 2019-06-05 11:33:17
-tags: [dapp,mpp,fee delegation,vip191,多方支付,代付,交易费]
+tags: [dapp,mpp,fee delegation,vip191,transaction fee,多方支付,代付,交易费]
 ---
 
 在上一篇 {% post_link Fee-Delegation-MPP-zh %} 中，介绍了 `MPP - 基于账户原型的交易费用代付协议` 也提到了它在某些情况下是无法满足开发者需求的。尤其是 [Totient Labs](https://www.totientlabs.com/) 在开发应用 [CometVerse](https://play.cometverse.com/) 的时候组合了多个合约又希望可以为用户付交易费，所以 [Totient Labs](https://www.totientlabs.com/) 提出了 [VIP-191](https://github.com/vechain/VIPs/blob/master/vips/VIP-191.md) 来扩展费用代付协议。

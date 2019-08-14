@@ -1,7 +1,7 @@
 ---
-title: Fee Delegation - MPP
+title: Fee Delegation - MPP(中文版)
 date: 2019-05-25 17:19:52
-tags: [dapp,mpp,fee delegation,vip191,多方支付,代付,交易费]
+tags: [dapp,mpp,fee delegation,vip191,transaction fee,多方支付,代付,交易费]
 ---
 
 在开始之前，我们先描述几个概念：
