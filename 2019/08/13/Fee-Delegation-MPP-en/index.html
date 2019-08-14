@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Before we start, let’s clarify some concepts: TxOrigin: the sender of transactions, an externally owned account.GasPayer: the account pays the transaction fee.Fee Delegation: transaction fee delegatio">
+<meta name="keywords" content="dapp,mpp,fee delegation,vip191,transaction fee">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fee Delegation-MPP">
+<meta property="og:url" content="https://blog.outofgas.io/2019/08/13/Fee-Delegation-MPP-en/index.html">
+<meta property="og:site_name" content="Insufficient Enerngy">
+<meta property="og:description" content="Before we start, let’s clarify some concepts: TxOrigin: the sender of transactions, an externally owned account.GasPayer: the account pays the transaction fee.Fee Delegation: transaction fee delegatio">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-08-14T07:06:32.685Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fee Delegation-MPP">
+<meta name="twitter:description" content="Before we start, let’s clarify some concepts: TxOrigin: the sender of transactions, an externally owned account.GasPayer: the account pays the transaction fee.Fee Delegation: transaction fee delegatio">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://blog.outofgas.io/2019/08/13/Fee-Delegation-MPP-en/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Fee Delegation-MPP | Insufficient Enerngy</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-142494873-2"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !true) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-142494873-2');
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Insufficient Enerngy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.outofgas.io/2019/08/13/Fee-Delegation-MPP-en/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tony.li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Insufficient Enerngy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Fee Delegation-MPP
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-08-13 17:50:15" itemprop="dateCreated datePublished" datetime="2019-08-13T17:50:15+00:00">2019-08-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-08-14 07:06:32" itemprop="dateModified" datetime="2019-08-14T07:06:32+00:00">2019-08-14</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Before we start, let’s clarify some concepts:</p>
+<p><code>TxOrigin</code>: the sender of transactions, an externally owned account.<br><code>GasPayer</code>: the account pays the transaction fee.<br><code>Fee Delegation</code>: transaction fee delegation(paid by a third-party), usually refers to the situation where the transaction fee is not paid by <code>TxOrigin</code>.<br><code>Multi Party Payment</code>: Multi-party Payment Protocol, a type of Fee Delegation.</p>
+<h2 id="The-Story"><a href="#The-Story" class="headerlink" title="The Story"></a>The Story</h2><p>We had experience in developing on Ethereum, and we figured a core problem to be tackled. People had difficulties in accepting the fact that <code>applications/tokens need to be funded by ETH as transaction fee</code>. In other words, it was not an easy task to promote blockchain applications, and it was even harder to have the users try out the applications for the <code>first time</code>. Therefore, we published the <code>prototype-based transaction fee delegation protocol</code> to lower the cost of using the blockchain application for users.</p>
+<a id="more"></a>
+<h2 id="Prototype"><a href="#Prototype" class="headerlink" title="Prototype"></a>Prototype</h2><p>In the beginning, it did not have a remarkable name, and it was named <code>prototype</code>, the prototype of the accounts. This was a straightforward concept, but it did reflect the important feature that was included in its first design. The <code>prototype</code> was a derivative of the ethereum account model in VeChain. We know there were two types of accounts: internal(contracts accounts) and external owned (accounts that are controlled by private keys), and they had following attributes: address, balance, code-hash, and storage root. Besides, we have added several concepts (included but not limited to those features, we are only discussing what’s related to fee delegation protocol here).</p>
+<ul>
+<li><code>Master</code>: the master to the account; an abstract idea similar to <code>Owners</code>. The master of an EOA is the account itself by default and it’s the account deployed it when comes to a contract.</li>
+<li><code>User</code>: user of the account, usually refers to the user of contracts.</li>
+<li><code>Sponsor</code>: accounts would like to pay transaction fee.</li>
+<li><code>CreditPlan</code>: credit plan set by the master of an account. In other words, it’s the maximum fee amount a contract covers for its user.</li>
+<li><code>UserCredit</code>: available credit for a particular user.</li>
+<li><code>RecoverRate</code>: when the UserCredit is lower than the CreditPlan, it will recover at a certain rate. When the RecoverRate equals to zero, the disposable credit would not be recovered.</li>
+</ul>
+<p>With a basic knowledge of the concepts above, it would be pretty easy to understand the <code>MPP</code>.</p>
+<h2 id="Multi-party-Payment-Protocol"><a href="#Multi-party-Payment-Protocol" class="headerlink" title="Multi-party Payment Protocol"></a>Multi-party Payment Protocol</h2><p>Understanding how transaction fee deducted is critical to understanding MPP:</p>
+<ul>
+<li>Check whether the <code>Clauses</code> of the transaction share the same recipient account(<code>CommonTo</code>)</li>
+<li>Check whether <code>TxOrigin</code> is the user of <code>CommonTo</code></li>
+<li>Check if there is sufficient user credit balance </li>
+<li>Check whether <code>CommonTo</code> has enough <code>VTHO</code> (fees will be taken out from Sponsor first)</li>
+</ul>
+<p>If the transaction satisfies all the requirements above, then it is a delegated transaction, which is represented as <code>GasPayer ≠ TxOrigin</code>. In this case, <code>GasPayer</code> could be the Sponsor of <code>CommonTo</code> or <code>CommonTo</code> itself.</p>
+<h2 id="Applications-and-limitations"><a href="#Applications-and-limitations" class="headerlink" title="Applications and limitations"></a>Applications and limitations</h2><p>The <code>prototype-based transaction fee delegation protocol</code> can be used to lower the cost of introducing new users and enables them to use the application for free. Just imagine, developers can set up the contract <code>prototype</code> in a few steps, and then users will be able to access blockchain applications without acquiring any tokens to pay for the transaction fee. In addition, <span class="label info">once the Prototype is set, it can be applied everywhere</span>.<del>As far as I’m concerned</del>, this is one of the ass-kicking protocols in blockchain applications:-), we should have more users get to know it.</p>
+<p>Well, now it’s time to talk about its limitations:</p>
+<ol>
+<li>Since the transaction fee is deducted on transactions instead of clauses, the prerequisite for the delegated transaction is to have <code>CommonTo</code>.</li>
+<li>Developers need to have it deployed before using, and must include every user in the user list of the contract.</li>
+</ol>
+<p>In a nutshell,</p>
+<div class="note warning">
+            <p>It enables applications to pay transaction fees for its users, but it is not flexible enough to cover all kinds of situations.</p>
+          </div>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/dapp/" rel="tag"># dapp</a>
+          
+            <a href="/tags/mpp/" rel="tag"># mpp</a>
+          
+            <a href="/tags/fee-delegation/" rel="tag"># fee delegation</a>
+          
+            <a href="/tags/vip191/" rel="tag"># vip191</a>
+          
+            <a href="/tags/transaction-fee/" rel="tag"># transaction fee</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/13/Fee-Delegation-VIP191-en/" rel="next" title="Fee Delegation-VIP191">
+                <i class="fa fa-chevron-left"></i> Fee Delegation-VIP191
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">tony.li</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#The-Story"><span class="nav-number">1.</span> <span class="nav-text">The Story</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prototype"><span class="nav-number">2.</span> <span class="nav-text">Prototype</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Multi-party-Payment-Protocol"><span class="nav-number">3.</span> <span class="nav-text">Multi-party Payment Protocol</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Applications-and-limitations"><span class="nav-number">4.</span> <span class="nav-text">Applications and limitations</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tony.li</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

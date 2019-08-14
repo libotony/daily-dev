@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在上一篇 Fee Delegation - MPP(中文版) 中，介绍了 MPP - 基于账户原型的交易费用代付协议 也提到了它在某些情况下是无法满足开发者需求的。尤其是 Totient Labs 在开发应用 CometVerse 的时候组合了多个合约又希望可以为用户付交易费，所以 Totient Labs 提出了 VIP-191 来扩展费用代付协议。 VIP-191 的内容VIP-191 的提出">
+<meta name="keywords" content="dapp,mpp,fee delegation,vip191,transaction fee,多方支付,代付,交易费">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fee Delegation - VIP191(中文版)">
+<meta property="og:url" content="https://blog.outofgas.io/2019/06/05/Fee-Delegation-VIP191-zh/index.html">
+<meta property="og:site_name" content="Insufficient Enerngy">
+<meta property="og:description" content="在上一篇 Fee Delegation - MPP(中文版) 中，介绍了 MPP - 基于账户原型的交易费用代付协议 也提到了它在某些情况下是无法满足开发者需求的。尤其是 Totient Labs 在开发应用 CometVerse 的时候组合了多个合约又希望可以为用户付交易费，所以 Totient Labs 提出了 VIP-191 来扩展费用代付协议。 VIP-191 的内容VIP-191 的提出">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-08-14T07:06:32.685Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fee Delegation - VIP191(中文版)">
+<meta name="twitter:description" content="在上一篇 Fee Delegation - MPP(中文版) 中，介绍了 MPP - 基于账户原型的交易费用代付协议 也提到了它在某些情况下是无法满足开发者需求的。尤其是 Totient Labs 在开发应用 CometVerse 的时候组合了多个合约又希望可以为用户付交易费，所以 Totient Labs 提出了 VIP-191 来扩展费用代付协议。 VIP-191 的内容VIP-191 的提出">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://blog.outofgas.io/2019/06/05/Fee-Delegation-VIP191-zh/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Fee Delegation - VIP191(中文版) | Insufficient Enerngy</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-142494873-2"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !true) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-142494873-2');
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Insufficient Enerngy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.outofgas.io/2019/06/05/Fee-Delegation-VIP191-zh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tony.li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Insufficient Enerngy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Fee Delegation - VIP191(中文版)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-06-05 11:33:17" itemprop="dateCreated datePublished" datetime="2019-06-05T11:33:17+00:00">2019-06-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-08-14 07:06:32" itemprop="dateModified" datetime="2019-08-14T07:06:32+00:00">2019-08-14</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在上一篇 <a href="/2019/05/25/Fee-Delegation-MPP-zh/" title="Fee Delegation - MPP(中文版)">Fee Delegation - MPP(中文版)</a> 中，介绍了 <code>MPP - 基于账户原型的交易费用代付协议</code> 也提到了它在某些情况下是无法满足开发者需求的。尤其是 <a href="https://www.totientlabs.com/" target="_blank" rel="noopener">Totient Labs</a> 在开发应用 <a href="https://play.cometverse.com/" target="_blank" rel="noopener">CometVerse</a> 的时候组合了多个合约又希望可以为用户付交易费，所以 <a href="https://www.totientlabs.com/" target="_blank" rel="noopener">Totient Labs</a> 提出了 <a href="https://github.com/vechain/VIPs/blob/master/vips/VIP-191.md" target="_blank" rel="noopener">VIP-191</a> 来扩展费用代付协议。</p>
+<h2 id="VIP-191-的内容"><a href="#VIP-191-的内容" class="headerlink" title="VIP-191 的内容"></a>VIP-191 的内容</h2><p>VIP-191 的提出是为了扩展费用代付协议，扩展它的应用场景来弥补原有 <code>MPP</code> 无法覆盖到的情况。 它主要包含以下方面：</p>
+<ol>
+<li>扩展交易模型，加入 <code>Delegator 签名</code> </li>
+<li>扩展交易模型, 加入 <code>Fee Delegated Flag</code> 明确交易仅在它设置为 true 的情况下才是 VIP-191 代付的交易</li>
+</ol>
+<a id="more"></a>
+<h2 id="交易构建流程"><a href="#交易构建流程" class="headerlink" title="交易构建流程"></a>交易构建流程</h2><ol>
+<li>构建交易未签名并设置<code>Fee Delegated Flag</code></li>
+<li><code>TxOrigin</code> 签名 &amp;&amp; <code>Delegator</code> 签名(无先后顺序限制)共同构成交易签名</li>
+<li>通过加入完整签名构建完整交易并广播到区块链</li>
+</ol>
+<h2 id="交易费的扣除"><a href="#交易费的扣除" class="headerlink" title="交易费的扣除"></a>交易费的扣除</h2><p>当执行一个指定<code>VIP-191</code>协议的交易时，区块链会从（且仅从） <code>Delegator</code> 账户扣除手续费。而不指定VIP-191协议的交易则应用 <code>MPP</code> 或直接从 <code>TxOrigin</code> 扣除手续费。</p>
+<h2 id="MPP-vs-VIP-191"><a href="#MPP-vs-VIP-191" class="headerlink" title="MPP vs VIP-191"></a>MPP vs VIP-191</h2><p>如果要简略的去概括它们两个之间的区别：</p>
+<ul>
+<li><code>MPP</code>：代付逻辑的维护在账户原型中（链上），<mark>一次配置处处生效</mark></li>
+<li><code>VIP-191</code>：代付逻辑维护在链下（独立的Delegator服务），<mark>代付行为是显式声明在交易当中且对交易内容无特殊要求</mark></li>
+</ul>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><h3 id="应用开发者"><a href="#应用开发者" class="headerlink" title="应用开发者"></a>应用开发者</h3><p>作为应用开发者，可以通过建立针对自身应用的 <code>Delegator 服务</code> 为应用的用户提供交易费用代付服务，使得用户无需手续费即可体验应用。</p>
+<h3 id="钱包开发者"><a href="#钱包开发者" class="headerlink" title="钱包开发者"></a>钱包开发者</h3><p>钱包的开发者可以实现 <code>Self delegate</code>，当某一个用户拥有多个账户时，钱包可以在付款确认的时候给用户提供一种额外的功能，这个功能可以允许用户选择除 <code>TxOrigin</code> 之外的另外一个账户来付交易手续费，这个账户就是 <code>GasPayer</code>。 这样可以让用户仅需在一个账户中持有 VTHO，其他的账户则不一定需要。</p>
+<h3 id="交易所开发者"><a href="#交易所开发者" class="headerlink" title="交易所开发者"></a>交易所开发者</h3><p>降低资金的归集（尤其是代币）的复杂程度以及VTHO的消耗。交易所可以通过设置统一的 <code>Delegator 网关</code>，无需预先转入交易费到发送方地址，只需发送方发起转账并设置交易为VIP-191代付账户之后，加入 <code>TxOrigin</code> 签名，并将构建好的交易发送到网关，由网关加入 <code>Delegator 签名</code> 构建成完整交易，发送到区块链即可实现由一个独立的账户支付所有交易手续费。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p><code>MPP</code> 和 <code>VIP-191</code> 共同组成了 VeChain 上的 <code>交易费用代付协议</code>，为唯链应用的开发者提供了更多的可能性，为唯链应用的用户提供了更加友好的用户体验。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/dapp/" rel="tag"># dapp</a>
+          
+            <a href="/tags/mpp/" rel="tag"># mpp</a>
+          
+            <a href="/tags/fee-delegation/" rel="tag"># fee delegation</a>
+          
+            <a href="/tags/vip191/" rel="tag"># vip191</a>
+          
+            <a href="/tags/transaction-fee/" rel="tag"># transaction fee</a>
+          
+            <a href="/tags/多方支付/" rel="tag"># 多方支付</a>
+          
+            <a href="/tags/代付/" rel="tag"># 代付</a>
+          
+            <a href="/tags/交易费/" rel="tag"># 交易费</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/25/Fee-Delegation-MPP-zh/" rel="next" title="Fee Delegation - MPP(中文版)">
+                <i class="fa fa-chevron-left"></i> Fee Delegation - MPP(中文版)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/13/Fee-Delegation-VIP191-en/" rel="prev" title="Fee Delegation-VIP191">
+                Fee Delegation-VIP191 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">tony.li</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#VIP-191-的内容"><span class="nav-number">1.</span> <span class="nav-text">VIP-191 的内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交易构建流程"><span class="nav-number">2.</span> <span class="nav-text">交易构建流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交易费的扣除"><span class="nav-number">3.</span> <span class="nav-text">交易费的扣除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MPP-vs-VIP-191"><span class="nav-number">4.</span> <span class="nav-text">MPP vs VIP-191</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景"><span class="nav-number">5.</span> <span class="nav-text">应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用开发者"><span class="nav-number">5.1.</span> <span class="nav-text">应用开发者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#钱包开发者"><span class="nav-number">5.2.</span> <span class="nav-text">钱包开发者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#交易所开发者"><span class="nav-number">5.3.</span> <span class="nav-text">交易所开发者</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">6.</span> <span class="nav-text">结语</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tony.li</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

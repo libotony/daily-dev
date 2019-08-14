@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在开始之前，我们先描述几个概念： TxOrigin: 交易发起方，一个外部账户（私钥控制的账户）GasPayer: 支付交易费用的账户Fee Delegation: 交易费用委托(代付), 一般指交易费用不是由 TxOrigin 支付的场景Multi Party Payment: 多方支付协议, Fee Delegation 的一种形式 起源我们之前有一段在以太坊上面开发的经验，我们发现向大众推广">
+<meta name="keywords" content="dapp,mpp,fee delegation,vip191,transaction fee,多方支付,代付,交易费">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fee Delegation - MPP(中文版)">
+<meta property="og:url" content="https://blog.outofgas.io/2019/05/25/Fee-Delegation-MPP-zh/index.html">
+<meta property="og:site_name" content="Insufficient Enerngy">
+<meta property="og:description" content="在开始之前，我们先描述几个概念： TxOrigin: 交易发起方，一个外部账户（私钥控制的账户）GasPayer: 支付交易费用的账户Fee Delegation: 交易费用委托(代付), 一般指交易费用不是由 TxOrigin 支付的场景Multi Party Payment: 多方支付协议, Fee Delegation 的一种形式 起源我们之前有一段在以太坊上面开发的经验，我们发现向大众推广">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-08-14T07:06:32.685Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fee Delegation - MPP(中文版)">
+<meta name="twitter:description" content="在开始之前，我们先描述几个概念： TxOrigin: 交易发起方，一个外部账户（私钥控制的账户）GasPayer: 支付交易费用的账户Fee Delegation: 交易费用委托(代付), 一般指交易费用不是由 TxOrigin 支付的场景Multi Party Payment: 多方支付协议, Fee Delegation 的一种形式 起源我们之前有一段在以太坊上面开发的经验，我们发现向大众推广">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://blog.outofgas.io/2019/05/25/Fee-Delegation-MPP-zh/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Fee Delegation - MPP(中文版) | Insufficient Enerngy</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-142494873-2"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !true) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-142494873-2');
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Insufficient Enerngy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.outofgas.io/2019/05/25/Fee-Delegation-MPP-zh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="tony.li">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Insufficient Enerngy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Fee Delegation - MPP(中文版)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-05-25 17:19:52" itemprop="dateCreated datePublished" datetime="2019-05-25T17:19:52+00:00">2019-05-25</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-08-14 07:06:32" itemprop="dateModified" datetime="2019-08-14T07:06:32+00:00">2019-08-14</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在开始之前，我们先描述几个概念：</p>
+<p><code>TxOrigin</code>: 交易发起方，一个外部账户（私钥控制的账户）<br><code>GasPayer</code>: 支付交易费用的账户<br><code>Fee Delegation</code>: 交易费用委托(代付), 一般指交易费用不是由 <code>TxOrigin</code> 支付的场景<br><code>Multi Party Payment</code>: 多方支付协议, <code>Fee Delegation</code> 的一种形式</p>
+<h2 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h2><p>我们之前有一段在以太坊上面开发的经验，我们发现向大众推广区块链应有会有一个核心问题需解决，用户对于<code>需要ETH来为应用/代币支付手续费</code>这件事情的接受有一定的困难，换句话说区块链应用向用户推广的难度偏高，想要获取用户的<code>首次点击尝试</code>变得相当困难。所以我们提出了<code>基于账户原型的交易费用代付协议</code>，来降低终端用户使用区块链应用的成本。</p>
+<a id="more"></a>
+<h2 id="Prototype-原型"><a href="#Prototype-原型" class="headerlink" title="Prototype - 原型"></a>Prototype - 原型</h2><p>在最初开始的时候它并没有一个响亮的名字，在内部它被称作<code>原型</code>,这个原型是指账户的原型。一个超级简略的名字，但是这个名字确实反映出来设计它的初衷。所有的账户都会基于<code>原型</code>来构造并自动继承它的全部属性。这个<code>原型</code>其实就是 VeChain 对于 Ethereum 的账户模型的扩展。我们知道在 Ethereum 中账户两种：内部账户（合约）和外部账户（私钥控制的账户），有以下属性: 地址、余额、代码哈希、存储。 我们在此基础上添加了一些概念（包括但不限于，这里仅讨论与代付协议相关的内容）。</p>
+<ul>
+<li><code>Master</code>: 地址对应的控制账户，一个抽象出来的类似于Owner的概念。外部账户的 Master 默认为它自己，合约账户则部署它的账户。</li>
+<li><code>User</code>: 账户的用户，一般指合约的用户。</li>
+<li><code>Sponsor</code>: 账户的赞助账户。</li>
+<li><code>CreditPlan</code>: 合约为它的用户设定的额度，指合约会为他的用户承担的交易费的上限值。</li>
+<li><code>UserCredit</code>: 用户的可用额度，合约的每个用户都会有一个当前的可用额度。</li>
+<li><code>RecoverRate</code>: 恢复速率，当用户的可用额度低于设定的额度时，可以以一定的速率恢复，恢复率为0则表示额度为一次性额度不会恢复。</li>
+</ul>
+<p>理解了上述概念，接下来理解 <code>MPP</code> 就很轻松了。</p>
+<h2 id="多方支付协议"><a href="#多方支付协议" class="headerlink" title="多方支付协议"></a>多方支付协议</h2><p>对于理解多方支付协议来说，理解交易费抵扣的逻辑是关键：</p>
+<ul>
+<li>检查交易的 <code>Clauses</code> 是否共享同一个接收账户(<code>CommonTo</code>)</li>
+<li>检查 <code>TxOrigin</code> 是否为合约账户 <code>CommonTo</code> 的用户</li>
+<li>检查用户的额度</li>
+<li>检查 <code>CommonTo</code> 的账户是否有足够的<code>VTHO</code>（优先从赞助账户扣除）</li>
+</ul>
+<p>如果以上检查都通过，则此交易为被代付的交易，最终会体现为交易的 <code>GasPayer ≠ TxOrigin</code>， 这个时候 <code>GasPayer</code> 可能是 <code>CommonTo</code> 的赞助者或者 <code>CommonTo</code> 本身。</p>
+<h2 id="应用场景以及短板"><a href="#应用场景以及短板" class="headerlink" title="应用场景以及短板"></a>应用场景以及短板</h2><p><code>基于账户原型的交易费用代付协议</code>可以初步降低应用引入用户的成本,让用户免费使用应用成为了可能。想象一下开发者通过几步对于合约<code>原型</code>的配置就可以让用户使用区块链应用，他可以实现<span class="label info">一次配置处处生效</span>。<del>我认为</del>这是区块链应用中杀手级的协议了:-)，<del>有机会</del>让更多的用户来了解来使用区块链应用。</p>
+<p>好了，夸了这么多也该聊聊他的缺点了：</p>
+<ol>
+<li>由于交易手续费的扣除的层次是交易而非子句，所以可以被代付的交易的前提就是要有<code>CommonTo</code></li>
+<li>在使用之前开发者需要进行配置，并且需要把每个用户都添加到合约的用户列表中</li>
+</ol>
+<p>总结起来，就是</p>
+<div class="note warning">
+            <p>可以实现应用为用户支付交易手续费，但是它不够灵活且无法覆盖到所有的应用场景</p>
+          </div>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/dapp/" rel="tag"># dapp</a>
+          
+            <a href="/tags/mpp/" rel="tag"># mpp</a>
+          
+            <a href="/tags/fee-delegation/" rel="tag"># fee delegation</a>
+          
+            <a href="/tags/vip191/" rel="tag"># vip191</a>
+          
+            <a href="/tags/transaction-fee/" rel="tag"># transaction fee</a>
+          
+            <a href="/tags/多方支付/" rel="tag"># 多方支付</a>
+          
+            <a href="/tags/代付/" rel="tag"># 代付</a>
+          
+            <a href="/tags/交易费/" rel="tag"># 交易费</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/20/Gas-Estimation/" rel="next" title="Gas Estimation">
+                <i class="fa fa-chevron-left"></i> Gas Estimation
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/05/Fee-Delegation-VIP191-zh/" rel="prev" title="Fee Delegation - VIP191(中文版)">
+                Fee Delegation - VIP191(中文版) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">tony.li</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#起源"><span class="nav-number">1.</span> <span class="nav-text">起源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Prototype-原型"><span class="nav-number">2.</span> <span class="nav-text">Prototype - 原型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多方支付协议"><span class="nav-number">3.</span> <span class="nav-text">多方支付协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用场景以及短板"><span class="nav-number">4.</span> <span class="nav-text">应用场景以及短板</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tony.li</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
